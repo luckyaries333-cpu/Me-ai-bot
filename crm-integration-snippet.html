@@ -1,0 +1,94 @@
+<!-- ════════════════════════════════════════════════════════════
+     HOW TO ADD "Call with AI" BUTTON TO YOUR CRM
+     ════════════════════════════════════════════════════════════
+
+     This shows the EXACT changes to make in your Field CRM (index.html)
+     so a "🤖 Call with AI" button appears next to the regular Call button
+     in the lead detail drawer.
+
+     Find this section in your Field CRM's <script type="module"> block
+     (search for "dbtns" — it's in the openDet function), and add the
+     new button as shown below.
+-->
+
+<script>
+// ── PASTE THESE TWO LINES near the top of your script, after the firebaseConfig ──
+const AI_BOT_URL = 'https://your-app-name.onrender.com';   // ← your Render URL from Step 4
+const AI_BOT_API_KEY = 'your-admin-api-key-here';           // ← same value as ADMIN_API_KEY in .env
+
+
+// ── ADD THIS NEW FUNCTION anywhere in your script (e.g. right after waLog) ──
+window.callWithAI = async function(id, phone, name) {
+  if (!phone) { toast('No phone number on this lead'); return; }
+  if (!confirm('Start an AI call to ' + name + ' now?')) return;
+
+  toast('Calling ' + name + ' with AI...');
+
+  try {
+    const response = await fetch(AI_BOT_URL + '/api/call/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': AI_BOT_API_KEY
+      },
+      body: JSON.stringify({ leadId: id, phone: phone, name: name })
+    });
+    const data = await response.json();
+    if (data.success) {
+      toast('AI is calling ' + name + ' now 📞');
+    } else {
+      toast('Could not start call: ' + (data.error || 'unknown error'));
+    }
+  } catch (err) {
+    toast('Error reaching AI bot server');
+    console.error(err);
+  }
+};
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     FIND THIS LINE in your openDet() function:
+     ════════════════════════════════════════════════════════════
+
+     '<div class="dbtns">'+(l.phone?'<button class="dbtn call" onclick="dialLog(\''+id+'\',\''+l.phone+'\')">📞 Call</button>':'<div></div>')+(l.phone?'<button class="dbtn wa" onclick="waLog(\''+id+'\',\''+l.phone+'\',\''+nm+'\')">💬 WhatsApp</button>':'<div></div>')+'<button class="dbtn edit" onclick="openEdit(\''+id+'\')">✏️ Edit</button><button class="dbtn del" onclick="delLead(\''+id+'\')">🗑️ Delete</button></div>'+
+
+     ════════════════════════════════════════════════════════════
+     REPLACE IT WITH (adds the AI Call button + makes the grid 3 columns):
+     ════════════════════════════════════════════════════════════
+-->
+
+<script>
+/*
+'<div class="dbtns" style="grid-template-columns:1fr 1fr 1fr">'+
+  (l.phone?'<button class="dbtn call" onclick="dialLog(\''+id+'\',\''+l.phone+'\')">📞 Call</button>':'<div></div>')+
+  (l.phone?'<button class="dbtn wa" onclick="waLog(\''+id+'\',\''+l.phone+'\',\''+nm+'\')">💬 WhatsApp</button>':'<div></div>')+
+  (l.phone?'<button class="dbtn" style="background:rgba(160,124,224,.1);color:#a07ce0;border-color:rgba(160,124,224,.3)" onclick="callWithAI(\''+id+'\',\''+l.phone+'\',\''+nm+'\')">🤖 AI Call</button>':'<div></div>')+
+  '<button class="dbtn edit" onclick="openEdit(\''+id+'\')">✏️ Edit</button>'+
+  '<button class="dbtn del" onclick="delLead(\''+id+'\')">🗑️ Delete</button>'+
+'</div>'+
+*/
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     OPTIONAL: Add a small purple "AI Qualified ✓" badge on cards
+     that have already been called by the bot.
+
+     In your renderLeads() card template, after the status badge, add:
+     ════════════════════════════════════════════════════════════
+-->
+
+<script>
+/*
+(l.aiQualified ? '<span style="font-size:9px;background:rgba(160,124,224,.15);color:#a07ce0;padding:2px 6px;border-radius:10px;margin-left:5px">🤖 AI Qualified</span>' : '')
+*/
+</script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     SAME CHANGES APPLY TO HEAD CRM (head.html) if you want
+     head office to also be able to trigger AI calls on any lead.
+     Same 3 steps: add the constants, add callWithAI(), add the button.
+     ════════════════════════════════════════════════════════════
+-->
