@@ -1,18 +1,17 @@
 {
-  "name": "mahendra-estates-ai-calling-bot",
-  "version": "1.0.0",
-  "description": "AI voice calling bot for Mahendra Estates CRM — calls leads and qualifies them via live conversation",
+  "name": "mahendra-whatsapp-bot",
+  "version": "2.0.0",
+  "description": "WhatsApp AI qualifying bot for Mahendra Estates CRM",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
     "body-parser": "^1.20.2",
-    "twilio": "^5.2.2",
+    "node-fetch": "^2.7.0",
     "openai": "^4.55.0",
-    "firebase": "^10.12.2",
+    "firebase-admin": "^12.3.0",
     "dotenv": "^16.4.5"
   },
   "engines": {
